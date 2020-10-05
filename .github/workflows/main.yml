@@ -7,10 +7,22 @@ jobs:
   deploy_zip:
     name: deploy lambda function
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
     steps:
       - uses: actions/checkout@v1
-      - name: Setup Dependencies
-        run: bin/setup
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install virtualenv
+          virtualenv .venv --python=`which python3`
+          source .venv/bin/activate
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Build Archive
         run: bin/archive
       - name: Deploy
