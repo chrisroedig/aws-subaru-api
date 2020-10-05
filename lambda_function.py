@@ -31,9 +31,6 @@ def lambda_handler(event, context):
     except json.decoder.JSONDecodeError as err:
         status_code = 400
         response_body = {'error': 'Bad Request, invalid JSON'}
-    except:
-        status_code = 500
-        response_body = {'error': 'Unexpected Error'}
     # NOTE: return value must follow expected format for 
     # API gateway lambda proxy intgration
     return {
