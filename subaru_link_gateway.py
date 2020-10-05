@@ -11,10 +11,11 @@ class SubaruLinkGateway():
     @property
     def summary(self):
         s = {}
-        s['status_time'] = datetime.fromtimestamp(self._car_data["status"][sc.TIMESTAMP])
+        
+        status_time = datetime.fromtimestamp(self._car_data["status"][sc.TIMESTAMP])
+        s['status_time'] = status_time.isoformat()
 
-        timediff = (datetime.now() - 
-            datetime.fromtimestamp(self._car_data["status"][sc.TIMESTAMP]))
+        timediff = (datetime.now() - status_time)
 
         s['status_timediff_str'] = "%d days, %d hours, %d minutes ago \n" % (
             timediff.days, 
