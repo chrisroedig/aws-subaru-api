@@ -46,7 +46,7 @@ class VehicleSystemController():
             if not await self._slink.unlock():
                 raise ControllerException('failed to unlock vehicle')
         elif params['doors'] == 'locked':
-            if not await self._slink.unlock():
+            if not await self._slink.lock():
                 raise ControllerException('failed to lock vehicle')
         else:
             raise InvalidParamException('invalid param value: doors')
