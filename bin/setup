@@ -1,0 +1,20 @@
+set -e
+
+if ! [ -x "$(command -v git)" ]; then
+  echo "Installing virtualenv"
+  pip install virtualenv
+fi
+
+if [ ! -d ".venv" ]; then  
+  echo "Creating virtual environment"
+  virtualenv .venv --python=`which python3`
+fi
+
+echo "Activating virtual environment"
+source .venv/bin/activate
+
+echo "Installing packages"
+pip install -r requirements.txt
+
+echo "Installing ipython for dev support"
+pip install ipython

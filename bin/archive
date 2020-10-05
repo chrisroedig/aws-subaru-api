@@ -1,0 +1,14 @@
+if [  -d ".venv" ]; then  
+  rm -rf tmp
+fi
+
+mkdir tmp
+
+set -e
+
+
+cd .venv/lib/python*/site-packages
+zip -r9 ${OLDPWD}/tmp/archive.zip .
+
+cd ${OLDPWD}
+zip -g tmp/archive.zip *.py

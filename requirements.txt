@@ -1,0 +1,3 @@
+aws-psycopg2
+python-dotenv
+subarulink
