@@ -18,6 +18,8 @@ class SubaruLinkService():
         self.__ctrl = None
         self.attributes = None
         self._pin = None
+        self._car_data = None
+        self._car_info = None
     
     @property
     def _ctrl(self):
@@ -68,6 +70,28 @@ class SubaruLinkService():
         await self._ctrl.update(self._current_vin)
         await self._fetch()
         return True
+
+    async def unlock(self):
+        LOGGER.info("Requesting door unlock for %s..." % self._ctrl.vin_to_name(self._current_vin))
+        if await self._ctrl.unlock(self._current_vin):
+            self._car_data['doors_locked'] = False
+            return True
+        else:
+            return False
+    
+    async def lock(self):
+        LOGGER.info("Requesting door unlock for %s..." % self._ctrl.vin_to_name(self._current_vin))
+        if await self._ctrl.lock(self._current_vin):
+            self._car_data['doors_locked'] = True
+            return True
+        else:
+            return False
+
+    async def start_engine(self):
+        LOGGER.info("Requesting engine START for %s..." % self._ctrl.vin_to_name(self._current_vin))
+    
+    async def stop_engine(self):
+        LOGGER.info("Requesting engine STOP for %s..." % self._ctrl.vin_to_name(self._current_vin))
 
     @property
     def car_data(self):

@@ -13,7 +13,7 @@ class SubaruLinkGateway():
         s = {}
         s['status_time'] = datetime.fromtimestamp(self._car_data["status"][sc.TIMESTAMP])
 
-        s['status_timediff'] = (datetime.now() - 
+        timediff = (datetime.now() - 
             datetime.fromtimestamp(self._car_data["status"][sc.TIMESTAMP]))
 
         s['status_timediff_str'] = "%d days, %d hours, %d minutes ago \n" % (
@@ -36,8 +36,9 @@ class SubaruLinkGateway():
         s['tire_press_rl'] = _kpa_to_psi(self._car_data["status"][sc.TIRE_PRESSURE_RL])
         s['tire_press_rr'] = _kpa_to_psi(self._car_data["status"][sc.TIRE_PRESSURE_RR])
 
-        if self._current_hasRemote:
-            s['ext_temp'] = _c_to_f(self._car_data["status"][sc.EXTERNAL_TEMP])
+        s['ext_temp'] = _c_to_f(self._car_data["status"].get(sc.EXTERNAL_TEMP,0))
+        s['locked'] =  self._car_data.get('locked')
+        return s
 
 def _km_to_miles(meters):
     return float(meters) * 0.62137119
