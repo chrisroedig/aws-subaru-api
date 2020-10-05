@@ -37,7 +37,7 @@ class SubaruLinkGateway():
         s['tire_press_rr'] = _kpa_to_psi(self._car_data["status"][sc.TIRE_PRESSURE_RR])
 
         s['ext_temp'] = _c_to_f(self._car_data["status"].get(sc.EXTERNAL_TEMP,0))
-        s['locked'] =  self._car_data.get('locked')
+        s['doors'] =  self._car_data.get('doors')
         return s
 
 def _km_to_miles(meters):

@@ -1,22 +1,63 @@
-import database
-from models import Climb
-import controllers
+import json
+from controllers import VehicleSystemController
+from controllers import ControllerException
 
 def lambda_handler(event, context):
-    # NOTE: requires mapping template on API gateway
-    path = event['context']['resource-path'][1:].replace("/","_")
-    method = event['context']['http-method'].lower()
-    params = event['body-json']
-    query_params = event['params']['querystring']
-
-    return dispatch_method(method, path, params, query_params)
+    # NOTE: event contains the entire API gateway context
+    # event => {
+    #     "resource": "",
+    #     "path": "", 
+    #     "httpMethod": "", 
+    #     "headers": {},
+    #     "multiValueHeaders": {} 
+    #     "queryStringParameters": null, 
+    #     "multiValueQueryStringParameters": null, 
+    #     "pathParameters": null, 
+    #     "stageVariables": null, 
+    #     "requestContext": {},
+    #     "body": "", 
+    #     "isBase64Encoded": false
+    # }
+    try:
+        request_body_json = json.loads(event['body'])
+        method = event['httpMethod']
+        path = event['path']
+        query_params = event['queryStringParameters']
+        [ status_code, response_body ] = dispatch_method(
+            method, path,
+            request_body_json,
+            query_params
+        )
+    except json.decoder.JSONDecodeError as err:
+        status_code = 400
+        response_body = {'error': 'Bad Request, invalid JSON'}
+    except:
+        status_code = 500
+        response_body = {'error': 'Unexpected Error'}
+    # NOTE: return value must follow expected format for 
+    # API gateway lambda proxy intgration
+    return {
+        'statusCode': status_code,
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        'body': json.dumps(response_body),
+        "isBase64Encoded": False }
 
 def dispatch_method(method, path, params, query_params):
-    # NOTE: worst router ever
-    resource_name = path.split("/")[-1].title()
-    method_name = method.lower()
-    controller = getattr(controllers, f'{resource_name}')
-    return getattr(controller, method_name)(params, query_params)
-    
-if __name__ == '__main__':
-    dispatch_method("PUT", "/doors", {'unlocked': True, 'pin':1234}, {'vin': ''})
+    try:
+        return VehicleSystemController().invoke(method, params, query_params)
+    except ControllerException as ex:
+        return (ex.status_code, { "error": str(ex) })
+
+if __name__ == "__main__":
+    #print(dispatch_method('put', '/foo', {}, None))
+    event = {
+        'queryStringParameters': None,
+        'httpMethod': 'PUT',
+        'path': '/foo',
+        'body': json.dumps({})
+    }
+    context = None
+    print(lambda_handler(event, context))

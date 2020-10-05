@@ -74,15 +74,15 @@ class SubaruLinkService():
     async def unlock(self):
         LOGGER.info("Requesting door unlock for %s..." % self._ctrl.vin_to_name(self._current_vin))
         if await self._ctrl.unlock(self._current_vin):
-            self._car_data['doors_locked'] = False
+            self._car_data['doors'] = 'unlocked'
             return True
         else:
             return False
     
     async def lock(self):
-        LOGGER.info("Requesting door unlock for %s..." % self._ctrl.vin_to_name(self._current_vin))
+        LOGGER.info("Requesting door lock for %s..." % self._ctrl.vin_to_name(self._current_vin))
         if await self._ctrl.lock(self._current_vin):
-            self._car_data['doors_locked'] = True
+            self._car_data['doors'] = 'locked'
             return True
         else:
             return False
