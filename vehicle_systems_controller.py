@@ -50,6 +50,12 @@ class VehicleSystemController():
                 raise ControllerException('failed to lock vehicle')
         else:
             raise InvalidParamException('invalid param value: doors')
+    
+    async def _actuate_engine(self, params):
+        if self._car_data.get("climate") is None:
+            await self._fetch_climate_settings()
+        await self._ctrl.remote_start(self._current_vin, self._car_data["climate"])
+    
 
 class ControllerException(Exception):
     status_code = 500
