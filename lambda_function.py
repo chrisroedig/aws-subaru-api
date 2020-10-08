@@ -6,7 +6,7 @@ import threading
 import os
 import settings
 
-SYNCHRONOUS = True
+SYNCHRONOUS = False
 
 def lambda_handler(event, context):
     # NOTE: event contains the entire API gateway context
