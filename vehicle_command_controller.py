@@ -7,12 +7,12 @@ import settings
 LOOP = asyncio.get_event_loop()
 
 class VehicleCommandController():
-    COMMANDS = ['lock', 'unlock', 'start', 'stop', 'lights', 'horn']
-    
+    COMMANDS = ['lock', 'unlock', 'start', 'stop']
+
     def __init__(self):
         self._slink = SubaruLinkService()
         self.command = None
-        self.response = (500, {'message': 'no response' })
+        self.response = (500, {'error': 'no response' })
 
     def post_command(self, params):
         command = params.get('command')
@@ -37,6 +37,7 @@ class VehicleCommandController():
         method = self.__getattribute__(method_name)
         LOOP.run_until_complete(method(self.params))
         LOOP.run_until_complete(self._disconnect())
+        self.response = (200, { 'message': f'{self.command} successful' })
     
     async def _disconnect(self):
         await self._slink.disconnect()
@@ -46,6 +47,13 @@ class VehicleCommandController():
 
     async def _execute_lock(self, params):
         await self._slink.lock()
+
+    async def _execute_start(self, params):
+        await self._slink.start_engine()
+    
+    async def _execute_stop(self, params):
+        await self._slink.stop_engine()
+
 
 class ControllerException(Exception):
     status_code = 500

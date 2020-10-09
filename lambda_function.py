@@ -6,8 +6,6 @@ import threading
 import os
 import settings
 
-SYNCHRONOUS = True
-
 def lambda_handler(event, context):
     # NOTE: event contains the entire API gateway context
     # event => {
@@ -53,15 +51,15 @@ def dispatch_method(method, path, params, query_params):
         if not method == 'POST':
             raise BadMethodException(f'HTTP {method} not supported')
         ctrl = VehicleCommandController()
-        ctrl_response = ctrl.post_command(params)
+        ctrl.post_command(params)
         
         exec_thread = threading.Thread(target = ctrl.execute_command)
         exec_thread.start()
 
-        if SYNCHRONOUS:
+        if params.get('synchronous'):
             exec_thread.join()
         
-        return ctrl_response
+        return ctrl.response
     except ControllerException as ex:
         return (ex.status_code, { "error": str(ex) })
 
@@ -73,7 +71,7 @@ if __name__ == "__main__":
         'path': '/foo',
         'body': json.dumps({
             'pin': os.getenv("SUBARU_PIN"),
-            'command': 'lock'
+            'command': 'unlock'
         })
     }
     context = None

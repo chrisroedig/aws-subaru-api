@@ -89,9 +89,14 @@ class SubaruLinkService():
 
     async def start_engine(self):
         LOGGER.info("Requesting engine START for %s..." % self._ctrl.vin_to_name(self._current_vin))
+        if self._car_data.get("climate") is None:
+            await self._ctrl.get_climate_settings(self._current_vin)
+            self._car_data = await self._ctrl.get_data(self._current_vin)
+        await self._ctrl.remote_start(self._current_vin, self._car_data["climate"])
     
     async def stop_engine(self):
         LOGGER.info("Requesting engine STOP for %s..." % self._ctrl.vin_to_name(self._current_vin))
+        await self._ctrl.remote_stop(self._current_vin)
 
     @property
     def car_data(self):
