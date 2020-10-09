@@ -21,26 +21,26 @@ class VehicleCommandController():
             raise AuthorizationException('Missing PIN')
         if command.lower() not in self.COMMANDS:
             raise InvalidParamException('Invalid Command')
-        LOOP.run_until_complete(self.validate_command(command, pin, params))
+        self.validate_command(command, pin, params)
         return self.response
 
-    async def validate_command(self, command, pin, params):
-        if await self._slink.connect(pin):
-            self.params = params
-            self.command = command.lower()
-            self.response = (202, {'command': command })
-        else:
-            raise ControllerException('Did not Connect')
-
+    def validate_command(self, command, pin, params):
+        self.pin = pin
+        self.params = params
+        self.command = command.lower()
+        self.response = (202, {'command': command })
+        
     def execute_command(self):
         method_name = f'_execute_{self.command}'
-        method = self.__getattribute__(method_name)
-        LOOP.run_until_complete(method(self.params))
+        self.command_method = self.__getattribute__(method_name)
+        LOOP.run_until_complete(self._execute_command())
         LOOP.run_until_complete(self._disconnect())
         self.response = (200, { 'message': f'{self.command} successful' })
     
-    async def _disconnect(self):
-        await self._slink.disconnect()
+    async def _execute_command(self):
+        if await self._slink.connect(self.pin):
+            await self.command_method(self.params)
+            await self._slink.disconnect()
 
     async def _execute_unlock(self, params):
         await self._slink.unlock()
