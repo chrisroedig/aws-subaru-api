@@ -8,25 +8,12 @@ import settings
 
 def lambda_handler(event, context):
     # NOTE: event contains the entire API gateway context
-    # event => {
-    #     "resource": "",
-    #     "path": "", 
-    #     "httpMethod": "", 
-    #     "headers": {},
-    #     "multiValueHeaders": {} 
-    #     "queryStringParameters": null, 
-    #     "multiValueQueryStringParameters": null, 
-    #     "pathParameters": null, 
-    #     "stageVariables": null, 
-    #     "requestContext": {},
-    #     "body": "", 
-    #     "isBase64Encoded": false
-    # }
+    # event => json decoded params from aws api gateway
     try:
-        request_body_json = json.loads(event['body'])
-        method = event['httpMethod']
-        path = event['path']
-        query_params = event['queryStringParameters']
+        request_body_json = event
+        method = 'POST' # assimng we set up the API gateway like this
+        path = '/'
+        query_params = {}
         [ status_code, response_body ] = dispatch_method(
             method, path,
             request_body_json,
@@ -58,7 +45,6 @@ def dispatch_method(method, path, params, query_params):
         return (ex.status_code, { "error": str(ex) })
 
 if __name__ == "__main__":
-    #print(dispatch_method('put', '/foo', {}, None))
     event = {
         'queryStringParameters': None,
         'httpMethod': 'POST',
