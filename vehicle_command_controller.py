@@ -34,7 +34,7 @@ class VehicleCommandController():
         method_name = f'_execute_{self.command}'
         self.command_method = self.__getattribute__(method_name)
         LOOP.run_until_complete(self._execute_command())
-        LOOP.run_until_complete(self._disconnect())
+        LOOP.run_until_complete(self._slink.disconnect())
         self.response = (200, { 'message': f'{self.command} successful' })
     
     async def _execute_command(self):

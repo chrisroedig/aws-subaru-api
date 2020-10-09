@@ -46,13 +46,8 @@ def dispatch_method(method, path, params, query_params):
 
 if __name__ == "__main__":
     event = {
-        'queryStringParameters': None,
-        'httpMethod': 'POST',
-        'path': '/foo',
-        'body': json.dumps({
             'pin': os.getenv("SUBARU_PIN"),
             'command': 'unlock'
-        })
-    }
+        }
     context = None
     print(lambda_handler(event, context))
