@@ -1,7 +1,16 @@
 import json
-from controllers import VehicleSystemController
-from controllers import ControllerException
+from vehicle_command_controller import VehicleCommandController
+from vehicle_command_controller import ControllerException
+from vehicle_command_controller import BadMethodException
+import threading
+import os
+import settings
 
+<<<<<<< HEAD
+=======
+SYNCHRONOUS = False
+
+>>>>>>> bf57f5cf5cd92d8fdb19cb2b5fc6e097ca1f406a
 def lambda_handler(event, context):
     # NOTE: event contains the entire API gateway context
     # event => {
@@ -44,7 +53,18 @@ def lambda_handler(event, context):
 
 def dispatch_method(method, path, params, query_params):
     try:
-        return VehicleSystemController().invoke(method, params, query_params)
+        if not method == 'POST':
+            raise BadMethodException(f'HTTP {method} not supported')
+        ctrl = VehicleCommandController()
+        ctrl.post_command(params)
+        
+        exec_thread = threading.Thread(target = ctrl.execute_command)
+        exec_thread.start()
+
+        if params.get('synchronous'):
+            exec_thread.join()
+        
+        return ctrl.response
     except ControllerException as ex:
         return (ex.status_code, { "error": str(ex) })
 
@@ -52,9 +72,12 @@ if __name__ == "__main__":
     #print(dispatch_method('put', '/foo', {}, None))
     event = {
         'queryStringParameters': None,
-        'httpMethod': 'PUT',
+        'httpMethod': 'POST',
         'path': '/foo',
-        'body': json.dumps({})
+        'body': json.dumps({
+            'pin': os.getenv("SUBARU_PIN"),
+            'command': 'unlock'
+        })
     }
     context = None
     print(lambda_handler(event, context))

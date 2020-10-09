@@ -10,19 +10,27 @@ This simplifies the interface making it easy to create automations that unlock o
 
 This basically creates a AWS lambda wrapper around the `subarulink` python library. Obviously you need to own a newer Subaru with an active starlink subscription that includes remote control features.
 
-## REST API
+## Command API
 
-* `PUT http://{your_api_gateway_url}` contol something...
-  * json encoded body: `{ 'pin': xxxx }`
-  * lock/unlock: add the param `doors` with value `locked` or `unlocked`
-  * TODO: start/stop engine add the param `engine` with value `running` or `stopped`
+* `POST http://{your_api_gateway_url}` send a command
+  * json encoded body: `{ 'pin': 'xxxx', 'command':'' }`
+  * the command param tells the car what to do:
+    * `lock` lock the doors
+    * `unlock` unlock the doors
+    * `start` start the engine
+    * `stop` stop the engine
   * TODO: climate settings
   * TODO: honk horn, turn on lights
 * TODO: `GET http://{your_api_gateway_url}` summary of vehicle status
 
+### Synchronous vs. Asynchronous
+
+By default this API will acknowledge with HTTP 202 immediately, then perform the backend API calls (takes ~5secs) to the car on a thread.
+To force the response to be delayed until everything is done, pass the parameter `'synchronous': true`.
+
 ### Example
 
-This will unlock the doors
+This will acknowledge immeditely, then unlock the doors
 
 ```
 POST /path/to/resource HTTP/1.1
@@ -32,7 +40,22 @@ x-api-key: xyz123
 
 {
   "pin": "1234",
-  "doors": "unlocked"
+  "command": "unlock"
+}
+```
+
+This will start the engine and respond once successful
+
+```
+POST /path/to/resource HTTP/1.1
+Host: api_id.execute-api.us-east-2.amazonaws.com
+Content-Type: application/json
+x-api-key: xyz123
+
+{
+  "pin": "1234",
+  "command": "start",
+  "synchronous": true
 }
 ```
 
