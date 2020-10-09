@@ -24,14 +24,7 @@ def lambda_handler(event, context):
         response_body = {'error': 'Bad Request, invalid JSON'}
     # NOTE: return value must follow expected format for 
     # API gateway lambda proxy intgration
-    return {
-        'statusCode': status_code,
-        'headers': {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
-        'body': json.dumps(response_body),
-        "isBase64Encoded": False }
+    return json.dumps(response_body)
 
 def dispatch_method(method, path, params, query_params):
     try:

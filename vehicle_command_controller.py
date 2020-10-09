@@ -41,6 +41,9 @@ class VehicleCommandController():
         if await self._slink.connect(self.pin):
             await self.command_method(self.params)
             await self._slink.disconnect()
+        else:
+            raise ControllerException('failed to connect')
+
 
     async def _execute_unlock(self, params):
         await self._slink.unlock()
