@@ -6,11 +6,6 @@ import threading
 import os
 import settings
 
-<<<<<<< HEAD
-=======
-SYNCHRONOUS = False
-
->>>>>>> bf57f5cf5cd92d8fdb19cb2b5fc6e097ca1f406a
 def lambda_handler(event, context):
     # NOTE: event contains the entire API gateway context
     # event => {
