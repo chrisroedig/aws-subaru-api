@@ -52,13 +52,7 @@ def dispatch_method(method, path, params, query_params):
             raise BadMethodException(f'HTTP {method} not supported')
         ctrl = VehicleCommandController()
         ctrl.post_command(params)
-        
-        exec_thread = threading.Thread(target = ctrl.execute_command)
-        exec_thread.start()
-
-        if params.get('synchronous'):
-            exec_thread.join()
-        
+        ctrl.execute_command()
         return ctrl.response
     except ControllerException as ex:
         return (ex.status_code, { "error": str(ex) })
